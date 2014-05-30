@@ -8,4 +8,8 @@ angular.module('angularSliderApp')
             'Karma'
         ];
         $scope.sliderValue = 50;
+
+        $scope.tickFormat = function(tickValue){
+            return (+tickValue).formatMoney();
+        };
     });

@@ -24,6 +24,9 @@ angular.module('angular-slider', [])
                             sliderRangeElement = angularChild;
                         }
                     });
+
+                generateTickMarks();
+
                 var sliderHandle = angular.element('<div class="angular-slider-handle"></div>');
                 sliderRangeElement.append(sliderHandle);
 
@@ -98,11 +101,21 @@ angular.module('angular-slider', [])
                     var rangePerTick = range / 4;
                     for(var tick = 0; tick < 5; ++tick){
                         var tickValue = scope.min + (rangePerTick * tick);
-                        var tickElement = angular.element("<span></span>").addClass("angular-slider-tick");
-                        var tick = {value: tickValue, position: calculateXForValue(tickValue)};
+                        var tickElement = angular.element("<span></span>")
+                            .addClass("angular-slider-tick")
+                            .css({top: (sliderRangeElement.prop('offsetTop') + sliderRangeElement.prop('offsetHeight')) + 'px'})
+                            .text(scope.tickFormat(tickValue));
+                        tickElement.prop('tickValue', tickValue);
+                        (function(tickElement){
+                            tickElement.ready(function(){
+                                tickElement.css({left: calculateXForValue(tickElement.prop('tickValue')) - (tickElement.prop('clientWidth') / 2) + 'px'});
+                            });
+                        }(tickElement));
+
+
+                        sliderRangeElement.append(tickElement);
                     }
                 }
-                generateTickMarks();
             }
         };
     }]);

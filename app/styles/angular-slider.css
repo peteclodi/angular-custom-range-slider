@@ -25,5 +25,6 @@
 }
 
 .angular-slider-tick {
-
+    position: absolute;
+    margin-top: 10px;
 }
