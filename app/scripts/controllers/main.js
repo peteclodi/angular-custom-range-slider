@@ -7,7 +7,7 @@ angular.module('angularSliderApp')
             'AngularJS',
             'Karma'
         ];
-        $scope.sliderValues = [25, 75];
+        $scope.sliderValues = [{value: 25, step: 1}, {value: 75, step: 5}];
         $scope.sliderValue = 50;
 
         $scope.tickFormat = function(tickValue){

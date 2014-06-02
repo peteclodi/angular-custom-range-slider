@@ -3,7 +3,6 @@
 angular.module('angular-slider', [])
     .directive('angularSlider', ['$document', function($document) {
         return {
-            require: 'ngModel',
             restrict: 'E',
             replace: true,
             scope: {
@@ -11,7 +10,7 @@ angular.module('angular-slider', [])
                 max: '=',
                 step: '@',
                 tickFormat: '&',
-                values: "="
+                handleValues: "="
             },
             templateUrl: 'views/angular-slider.html',
             link: function(scope, element, attrs){
@@ -28,23 +27,37 @@ angular.module('angular-slider', [])
                         }
                     });
 
-                if(angular.isUndefined(scope.step)) {
-                    scope.step = 1;
-                }
-
                 if(scope.showTicks){
                     generateTickMarks();
                 }
 
                 var sliderHandles = [];
-                scope.values.forEach(function(value){
-                    var sliderHandle = angular.element('<div class="angular-slider-handle"></div>');
+                scope.handleValues.forEach(function(handleValue, index){
+                    var sliderHandleClass = 'angular-slider-handle-' + index;
+                    var sliderHandle = angular.element('<div class="angular-slider-handle ' + sliderHandleClass + '"></div>');
                     sliderRangeElement.append(sliderHandle);
                     sliderHandles.push(sliderHandle);
 
+                    if(angular.isUndefined(handleValue.step) ||
+                        ((scope.max - scope.min) % handleValue.step !== 0) ||
+                        (handleValue.value % handleValue.step !== 0)) {
+                        if((scope.max - scope.min) % handleValue.step !== 0) {
+                            console.log("The handle's step value (" + handleValue.step +
+                                        ") must be a rational divisor of the slider's range (" +
+                                        (scope.max - scope.min) + ")");
+                        }
+                        else if(handleValue.value % handleValue.step !== 0) {
+                            console.log("The handle's step value (" + handleValue.step +
+                                        ") must be a rational divisor of the handle's value (" +
+                                        handleValue.value + ")");
+                        }
+                        console.log("The handle's step value is being reset to 1");
+                        handleValue.step = 1;
+                    }
+
                     sliderHandle.prevPageX = 0;
                     sliderHandle.ready(function(){
-                        sliderHandle.prevPageX = setHandlePositionByValue(sliderHandle, value);
+                        sliderHandle.prevPageX = setHandlePositionByValue(sliderHandle, handleValue.value);
                     });
 
                     sliderHandle.on('mousedown', function(event) {
@@ -66,18 +79,27 @@ angular.module('angular-slider', [])
                             (sliderRangeElement.prop('offsetLeft') + sliderRangeElement.prop('clientWidth')) < event.pageX){
                             return;
                         }
-                        var newValue = Math.round(getValueByPosition(event.pageX - sliderRangeElement.prop('offsetLeft')));
-                        if((newValue % scope.step) !== 0) {
+
+                        if(sliderHandles.some(function(sliderHandleItr){
+                            if(this === sliderHandleItr) return false;
+                            return (movingLeft && sliderHandleItr.prevPageX > event.pageX) ||
+                                    sliderHandleItr.prevPageX < event.pageX;
+                        }, sliderHandle)){
                             return;
                         }
-                        sliderHandle.x = event.pageX - (sliderHandle.prop('clientWidth') / 2);
+
+                        var newValue = Math.round(getValueByPosition(event.pageX - sliderRangeElement.prop('offsetLeft')));
+                        if((newValue % handleValue.step) !== 0) {
+                            return;
+                        }
+                        sliderHandle.x = Math.round(event.pageX - (sliderHandle.prop('clientWidth') / 2));
                         sliderHandle.css({
                             left:  sliderHandle.x + 'px'
                         });
                         sliderHandle.prevPageX = event.pageX;
-                        scope.value = newValue;
+                        handleValue.value = newValue;
                         // force the application of the scope.value update
-                        scope.$apply('value');
+                        scope.$apply('handleValue.value');
                     }
 
                     function mouseup() {
@@ -87,7 +109,7 @@ angular.module('angular-slider', [])
                 });
 
                 function calculateXForValue(value){
-                    return (sliderRangeElement.prop('clientWidth') * ((value - scope.min) / (scope.max - scope.min))) + sliderRangeElement.prop('offsetLeft');
+                    return Math.round((sliderRangeElement.prop('clientWidth') * ((value - scope.min) / (scope.max - scope.min))) + sliderRangeElement.prop('offsetLeft'));
                 }
 
                 function calculateHandleXAtValue(handle, value){
