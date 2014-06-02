@@ -10,6 +10,7 @@ angular.module('angularSliderApp')
         $scope.sliderValue = 50;
 
         $scope.tickFormat = function(tickValue){
+            // Ensure that the value is a number
             return (+tickValue).formatMoney();
         };
     });
