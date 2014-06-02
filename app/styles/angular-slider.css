@@ -20,11 +20,15 @@
 
 .angular-slider-value {
     float: left;
-    margin: 50px 0 0 50px;
+    margin: 7.5% 0 0 50px;
     font-size: 20px;
+}
+
+.angular-slider-last-value {
+    margin-right: 7.5%;
 }
 
 .angular-slider-tick {
     position: absolute;
-    margin-top: 10px;
+    margin-top: 25px;
 }

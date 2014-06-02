@@ -11,10 +11,13 @@ angular.module('angular-slider', [])
                 max: '=',
                 step: '@',
                 tickFormat: '&',
-                value: "="
+                values: "="
             },
             templateUrl: 'views/angular-slider.html',
-            link: function(scope, element){
+            link: function(scope, element, attrs){
+                scope.showTicks = angular.isDefined(attrs.showTicks);
+                scope.showValues = angular.isDefined(attrs.showValues);
+
                 var sliderRangeElement = undefined;
                 angular.forEach(element.children(),
                     function(child){
@@ -29,25 +32,70 @@ angular.module('angular-slider', [])
                     scope.step = 1;
                 }
 
-                generateTickMarks();
-
-                var sliderHandle = angular.element('<div class="angular-slider-handle"></div>');
-                sliderRangeElement.append(sliderHandle);
-
-                function calculatePointsPerVal(range){
-                    return sliderRangeElement.prop('clientWidth') / range;
+                if(scope.showTicks){
+                    generateTickMarks();
                 }
+
+                var sliderHandles = [];
+                scope.values.forEach(function(value){
+                    var sliderHandle = angular.element('<div class="angular-slider-handle"></div>');
+                    sliderRangeElement.append(sliderHandle);
+                    sliderHandles.push(sliderHandle);
+
+                    sliderHandle.prevPageX = 0;
+                    sliderHandle.ready(function(){
+                        sliderHandle.prevPageX = setHandlePositionByValue(sliderHandle, value);
+                    });
+
+                    sliderHandle.on('mousedown', function(event) {
+                        if(event.button !== 0){
+                            return;
+                        }
+                        // Prevent default dragging of selected content
+                        event.preventDefault();
+                        $document.on('mousemove', mousemove);
+                        $document.on('mouseup', mouseup);
+                    });
+
+                    function mousemove(event) {
+                        if(event.pageX === sliderHandle.prevPageX){
+                            return;
+                        }
+                        var movingLeft = event.pageX < sliderHandle.prevPageX;
+                        if((movingLeft && (sliderRangeElement.prop('offsetLeft') > event.pageX)) ||
+                            (sliderRangeElement.prop('offsetLeft') + sliderRangeElement.prop('clientWidth')) < event.pageX){
+                            return;
+                        }
+                        var newValue = Math.round(getValueByPosition(event.pageX - sliderRangeElement.prop('offsetLeft')));
+                        if((newValue % scope.step) !== 0) {
+                            return;
+                        }
+                        sliderHandle.x = event.pageX - (sliderHandle.prop('clientWidth') / 2);
+                        sliderHandle.css({
+                            left:  sliderHandle.x + 'px'
+                        });
+                        sliderHandle.prevPageX = event.pageX;
+                        scope.value = newValue;
+                        // force the application of the scope.value update
+                        scope.$apply('value');
+                    }
+
+                    function mouseup() {
+                        $document.off('mousemove', mousemove);
+                        $document.off('mouseup', mouseup);
+                    }
+                });
 
                 function calculateXForValue(value){
                     return (sliderRangeElement.prop('clientWidth') * ((value - scope.min) / (scope.max - scope.min))) + sliderRangeElement.prop('offsetLeft');
                 }
 
-                function calculateHandleXAtValue(value){
-                    return calculateXForValue(value) - (sliderHandle.prop('clientWidth') / 2);
+                function calculateHandleXAtValue(handle, value){
+                    return calculateXForValue(value) - (handle.prop('clientWidth') / 2);
                 }
 
                 function setHandlePositionByValue(handle, value){
-                    handle.x = calculateHandleXAtValue(value);
+                    handle.x = calculateHandleXAtValue(handle, value);
                     handle.css({
                         left:  handle.x + 'px'
                     });
@@ -58,50 +106,6 @@ angular.module('angular-slider', [])
                     var positionRatio = position / sliderRangeElement.prop('clientWidth');
                     var pointOffset = (scope.max - scope.min) * positionRatio;
                     return pointOffset + scope.min;
-                }
-
-                var prevPageX = 0;
-
-                sliderHandle.ready(function(){
-                    prevPageX = setHandlePositionByValue(sliderHandle, scope.value);
-                });
-
-                sliderHandle.on('mousedown', function(event) {
-                    if(event.button !== 0){
-                        return;
-                    }
-                    // Prevent default dragging of selected content
-                    event.preventDefault();
-                    $document.on('mousemove', mousemove);
-                    $document.on('mouseup', mouseup);
-                });
-
-                function mousemove(event) {
-                    if(event.pageX === prevPageX){
-                        return;
-                    }
-                    var movingLeft = event.pageX < prevPageX;
-                    if((movingLeft && (sliderRangeElement.prop('offsetLeft') > event.pageX)) ||
-                       (sliderRangeElement.prop('offsetLeft') + sliderRangeElement.prop('clientWidth')) < event.pageX){
-                        return;
-                    }
-                    var newValue = Math.round(getValueByPosition(event.pageX - sliderRangeElement.prop('offsetLeft')));
-                    if((newValue % scope.step) !== 0) {
-                        return;
-                    }
-                    sliderHandle.x = event.pageX - (sliderHandle.prop('clientWidth') / 2);
-                    sliderHandle.css({
-                        left:  sliderHandle.x + 'px'
-                    });
-                    prevPageX = event.pageX;
-                    scope.value = newValue;
-                    // force the application of the scope.value update
-                    scope.$apply('value');
-                }
-
-                function mouseup() {
-                    $document.off('mousemove', mousemove);
-                    $document.off('mouseup', mouseup);
                 }
 
                 function generateTickMarks() {
@@ -123,6 +127,10 @@ angular.module('angular-slider', [])
                         sliderRangeElement.append(tickElement);
                     }
                 }
+
+                scope.formatTickValue = function(tickValue) {
+                    return scope.tickFormat({value: tickValue});
+                };
             }
         };
     }]);
