@@ -35,6 +35,7 @@ angular.module('angular-slider', [])
                 scope.handleValues.forEach(function(handleValue, index){
                     var sliderHandleClass = 'angular-slider-handle-' + index;
                     var sliderHandle = angular.element('<div class="angular-slider-handle ' + sliderHandleClass + '"></div>');
+                    sliderHandle.handleIndex = index;
                     sliderRangeElement.append(sliderHandle);
                     sliderHandles.push(sliderHandle);
 
@@ -57,7 +58,8 @@ angular.module('angular-slider', [])
 
                     sliderHandle.prevPageX = 0;
                     sliderHandle.ready(function(){
-                        sliderHandle.prevPageX = setHandlePositionByValue(sliderHandle, handleValue.value);
+                        sliderHandle.prevPageX = calculateXForValue(handleValue.value);
+                        setHandlePositionByValue(sliderHandle, handleValue.value);
                     });
 
                     sliderHandle.on('mousedown', function(event) {
@@ -80,11 +82,11 @@ angular.module('angular-slider', [])
                             return;
                         }
 
-                        if(sliderHandles.some(function(sliderHandleItr){
-                            if(this === sliderHandleItr) return false;
-                            return (movingLeft && sliderHandleItr.prevPageX > event.pageX) ||
-                                    sliderHandleItr.prevPageX < event.pageX;
-                        }, sliderHandle)){
+                        var prevSlider = sliderHandle.handleIndex > 0 ? sliderHandles[sliderHandle.handleIndex - 1] : undefined;
+                        var nextSlider = sliderHandle.handleIndex < (sliderHandles.length - 1) ? sliderHandles[sliderHandle.handleIndex + 1] : undefined;
+
+                        if((movingLeft && (angular.isDefined(prevSlider) && prevSlider.prevPageX >= event.x)) ||
+                           (angular.isDefined(nextSlider) && nextSlider.prevPageX <= event.x)){
                             return;
                         }
 
@@ -98,7 +100,7 @@ angular.module('angular-slider', [])
                         });
                         sliderHandle.prevPageX = event.pageX;
                         handleValue.value = newValue;
-                        // force the application of the scope.value update
+                        // force the application of the scope.handleValues[].value update
                         scope.$apply('handleValue.value');
                     }
 

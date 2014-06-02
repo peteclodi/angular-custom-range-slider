@@ -1,13 +1,19 @@
 <div class="jumbotron">
-  <h1>'Allo, 'Allo!</h1>
-  <p class="lead">
-    <img src="images/yeoman.png" alt="I'm Yeoman"><br>
-    Always a pleasure scaffolding your apps.
-  </p>
-  <p><a class="btn btn-lg btn-success" ng-href="#">Splendid!<span class="glyphicon glyphicon-ok"></span></a></p>
-
-    <span class="slider-text">Slider</span>
+    <h1>'Allo, 'Allo!</h1>
+    <p class="lead">
+        <img src="images/yeoman.png" alt="I'm Yeoman"><br>
+        Always a pleasure scaffolding your apps.
+    </p>
     <div class="slider-container">
-        <angular-slider min="20" max="80" handle-values="sliderValues" show-values show-ticks tick-format="tickFormat(value)"></angular-slider>
+        <h3>Simple Slider: 1 Handle</h3>
+        <angular-slider min="20" max="80" handle-values="simpleSliderValues" show-values show-ticks tick-format="tickFormat(value)"></angular-slider>
+    </div>
+    <div class="slider-container">
+        <h3>Range Slider: 2 Handles</h3>
+        <angular-slider min="20" max="80" handle-values="rangeSliderValues" show-values show-ticks tick-format="tickFormat(value)"></angular-slider>
+    </div>
+    <div class="slider-container">
+        <h3>Complex Range Slider: 3 Handles</h3>
+        <angular-slider min="20" max="80" handle-values="complexRangeSliderValues" show-values show-ticks tick-format="tickFormat(value)"></angular-slider>
     </div>
 </div>
