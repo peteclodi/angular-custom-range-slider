@@ -3,6 +3,7 @@
 angular
   .module('angularSliderApp', [
     'ngRoute',
+    'ngTouch',
     'angular-slider'
   ])
   .config(function ($routeProvider) {
