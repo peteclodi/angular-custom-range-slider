@@ -32,12 +32,29 @@ angular.module('angular-slider', [])
                 }
 
                 var sliderHandles = [];
+                var sliderInnerRangeIndex = 0;
                 scope.handleValues.forEach(function(handleValue, index){
-                    var sliderHandleClass = 'angular-slider-handle-' + index;
-                    var sliderHandle = angular.element('<div class="angular-slider-handle ' + sliderHandleClass + '"></div>');
+                    var sliderHandleClass = "angular-slider-handle";
+                    var sliderHandle =
+                        angular.element("<div></div>")
+                            .addClass(sliderHandleClass)
+                            .addClass(sliderHandleClass + "-" + index);
                     sliderHandle.handleIndex = index;
                     sliderRangeElement.append(sliderHandle);
                     sliderHandles.push(sliderHandle);
+
+                    if(index < (scope.handleValues.length -1)){
+                        var sliderInnerRangeClass = "angular-slider-inner-range";
+                        var sliderInnerRangeElement =
+                            angular.element("<div></div>")
+                                .addClass(sliderInnerRangeClass)
+                                .addClass(sliderInnerRangeClass + "-" + sliderInnerRangeIndex++)
+                                .css({
+                                    position: "absolute"
+                                });
+                        sliderRangeElement.append(sliderInnerRangeElement);
+                        sliderHandle.innerRangeElement = sliderInnerRangeElement;
+                    }
 
                     if(angular.isUndefined(handleValue.step) ||
                         ((scope.max - scope.min) % handleValue.step !== 0) ||
@@ -64,11 +81,14 @@ angular.module('angular-slider', [])
 
                     $swipe.bind(sliderHandle, {
                         start: function(coords){
+                            console.log("$swipe.start: (" + coords.x + "," + coords.y + ")");
                         },
                         move: function(coords){
+                            console.log("$swipe.move: (" + coords.x + "," + coords.y + ")");
                             swipeMove(coords.x);
                         },
                         end: function(){
+                            console.log("$swipe.end");
                         },
                         cancel: function(){
                         }

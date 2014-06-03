@@ -18,6 +18,11 @@
     height: 35px;
 }
 
+.angular-slider-inner-range {
+    background: #3233b3;
+    height: 25px;
+}
+
 .angular-slider-value {
     float: left;
     margin: 7.5% 0 0 50px;
