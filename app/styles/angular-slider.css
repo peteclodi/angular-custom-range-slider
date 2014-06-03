@@ -20,12 +20,28 @@
 
 .angular-slider-value {
     float: left;
-    margin: 7.5% 0 0 50px;
-    font-size: 20px;
+    margin: 50px 0 0 12px;
+    font-size: 16px;
+    text-align: right;
 }
 
-.angular-slider-last-value {
-    margin-right: 7.5%;
+.angular-slider-first-value {
+    margin-left: 0;
+}
+
+.angular-slider-only-value {
+    width: 25%;
+}
+
+.angular-slider-invalid-value {
+    border-color: #843534;
+    color: #843534;
+    outline-color: #ff8787;
+}
+
+.angular-slider-values {
+    margin-left: 7.5%;
+    width: 85%
 }
 
 .angular-slider-tick {

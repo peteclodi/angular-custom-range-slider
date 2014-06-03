@@ -9,13 +9,19 @@ angular.module('angular-slider', [])
                 min: '=',
                 max: '=',
                 step: '@',
-                tickFormat: '&',
+                tickToFormatted: '&',
+                formattedToTick: '&',
+                isValidFormattedValue: '&',
                 handleValues: "="
             },
             templateUrl: 'views/angular-slider.html',
             link: function(scope, element, attrs){
                 scope.showTicks = angular.isDefined(attrs.showTicks);
                 scope.showValues = angular.isDefined(attrs.showValues);
+
+                var inputSections = scope.handleValues.length < 3 ? 4 : Math.max(scope.handleValues.length, 3);
+                var inputSectionOffset = scope.handleValues.length >= 3 ? 2.25 : 0;
+                scope.inputWidths = Math.round(((1 / inputSections) * 100) - inputSectionOffset) + '%';
 
                 var sliderRangeElement = undefined;
                 angular.forEach(element.children(),
@@ -38,6 +44,7 @@ angular.module('angular-slider', [])
                     sliderHandle.handleIndex = index;
                     sliderRangeElement.append(sliderHandle);
                     sliderHandles.push(sliderHandle);
+                    handleValue.sliderHandle = sliderHandle;
 
                     if(angular.isUndefined(handleValue.step) ||
                         ((scope.max - scope.min) % handleValue.step !== 0) ||
@@ -56,10 +63,11 @@ angular.module('angular-slider', [])
                         handleValue.step = 1;
                     }
 
+                    handleValue.displayValue = formatTickValue(handleValue.value);
+
                     sliderHandle.prevPageX = 0;
                     sliderHandle.ready(function(){
-                        sliderHandle.prevPageX = calculateXForValue(handleValue.value);
-                        setHandlePositionByValue(sliderHandle, handleValue.value);
+                        updateSliderHandleElement(sliderHandle, handleValue.value);
                     });
 
                     $swipe.bind(sliderHandle, {
@@ -102,6 +110,8 @@ angular.module('angular-slider', [])
                         });
                         sliderHandle.prevPageX = pageX;
                         handleValue.value = newValue;
+                        handleValue.displayValue = formatTickValue(handleValue.value);
+
                         // force the application of the scope.handleValues[].value update
                         scope.$apply('handleValue.value');
                     }
@@ -113,6 +123,11 @@ angular.module('angular-slider', [])
 
                 function calculateHandleXAtValue(handle, value){
                     return calculateXForValue(value) - (handle.prop('clientWidth') / 2);
+                }
+
+                function updateSliderHandleElement(sliderHandle, value){
+                    sliderHandle.prevPageX = calculateXForValue(value);
+                    setHandlePositionByValue(sliderHandle, value);
                 }
 
                 function setHandlePositionByValue(handle, value){
@@ -136,9 +151,8 @@ angular.module('angular-slider', [])
                         var tickValue = scope.min + (rangePerTick * tick);
                         var tickElement = angular.element("<span></span>")
                             .addClass("angular-slider-tick")
-                            .css({top: (sliderRangeElement.prop('offsetTop') + sliderRangeElement.prop('offsetHeight')) + 'px'})
-                            // pass the value in as an object so that it will be properly marshaled to the parent controller
-                            .text(scope.tickFormat({value: tickValue}));
+                            .css({top: (sliderRangeElement.prop('offsetTop') + sliderRangeElement.prop('offsetHeight')) + 'px'});
+                        tickElement.text(formatTickValue(tickValue));
                         tickElement.prop('tickValue', tickValue);
                         (function(tickElement){
                             tickElement.ready(function(){
@@ -149,9 +163,26 @@ angular.module('angular-slider', [])
                     }
                 }
 
-                scope.formatTickValue = function(tickValue) {
-                    return scope.tickFormat({value: tickValue});
+                function formatTickValue(tickValue) {
+                    // pass the value in as an object so that it will be properly marshaled to the parent controller
+                    return scope.tickToFormatted({value: tickValue});
+                }
+
+                scope.handleValueChanged = function(handleValue) {
+                    // pass the value in as an object so that it will be properly marshaled to the parent controller
+                    if(scope.isValid(handleValue.displayValue)) {
+                        handleValue.value = scope.formattedToTick({value: handleValue.displayValue});
+                        updateSliderHandleElement(handleValue.sliderHandle, handleValue.value);
+                    }
                 };
+
+                scope.isValid = function(displayValue) {
+                    if(scope.isValidFormattedValue({value: displayValue})){
+                        var value = scope.formattedToTick({value: displayValue})
+                        return (value >= scope.min && value <= scope.max);
+                    }
+                    return false;
+                }
             }
         };
     }]);
