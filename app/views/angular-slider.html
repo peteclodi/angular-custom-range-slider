@@ -1,5 +1,10 @@
 <div class="angular-slider">
     <div class="angular-slider-range"></div>
-    <span class="angular-slider-value" ng-if="showValues" ng-repeat="handleValue in handleValues"
-          ng-class="{'angular-slider-last-value': $last}" ng-style="$last && !$first ? {float: 'right'} : {}">{{formatTickValue(handleValue.value)}}</span>
+    <div class="angular-slider-values">
+        <input class="angular-slider-value" ng-if="showValues" ng-repeat="handleValue in handleValues"
+               ng-class="{'angular-slider-first-value': $first, 'angular-slider-only-value': $first && $last, 'angular-slider-invalid-value': !isValid(handleValue.displayValue)}"
+               ng-style="$last && !$first ? {float: 'right', width: '{{inputWidths}}'} :
+                         !($last && $first) ? {width: '{{inputWidths}}'}: {}"
+               ng-change="handleValueChanged(handleValue)" ng-model="handleValue.displayValue"/>
+    </div>
 </div>

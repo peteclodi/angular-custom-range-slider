@@ -6,18 +6,29 @@
     </p>
     <div class="slider-container">
         <h3>Simple Slider: 1 Handle</h3>
-        <angular-slider min="20" max="80" handle-values="simpleSliderValues" show-values show-ticks tick-format="tickFormat(value)"></angular-slider>
+        <angular-slider min="20" max="80" handle-values="simpleSliderValues" show-values show-ticks
+                        is-valid-formatted_value="isValidFormattedValue(value)" formatted-to-tick="formattedToTick(value)"
+                        tick-to-formatted="tickToFormatted(value)"></angular-slider>
+
     </div>
     <div class="slider-container">
         <h3>Range Slider: 2 Handles</h3>
-        <angular-slider min="20" max="80" handle-values="rangeSliderValues" show-values show-ticks tick-format="tickFormat(value)"></angular-slider>
+        <angular-slider min="20" max="80" handle-values="rangeSliderValues" show-values show-ticks
+                        is-valid-formatted_value="isValidFormattedValue(value)" formatted-to-tick="formattedToTick(value)"
+                        tick-to-formatted="tickToFormatted(value)"></angular-slider>
+
     </div>
     <div class="slider-container">
         <h3>Complex Range Slider: 3 Handles</h3>
-        <angular-slider min="20" max="80" handle-values="complexRangeSliderValues" show-values show-ticks tick-format="tickFormat(value)"></angular-slider>
+        <angular-slider min="20" max="80" handle-values="complexRangeSliderValues" show-values show-ticks
+                        is-valid-formatted_value="isValidFormattedValue(value)" formatted-to-tick="formattedToTick(value)"
+                        tick-to-formatted="tickToFormatted(value)"></angular-slider>
+
     </div>
     <div class="slider-container">
         <h3>Very Complex Range Slider: 6 Handles</h3>
-        <angular-slider min="20" max="80" handle-values="veryComplexRangeSliderValues" show-values show-ticks tick-format="tickFormat(value)"></angular-slider>
+        <angular-slider min="20" max="80" handle-values="veryComplexRangeSliderValues" show-values show-ticks
+                        is-valid-formatted_value="isValidFormattedValue(value)" formatted-to-tick="formattedToTick(value)"
+                        tick-to-formatted="tickToFormatted(value)"></angular-slider>
     </div>
 </div>
