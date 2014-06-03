@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('angular-slider', [])
-    .directive('angularSlider', ['$document', function($document) {
+    .directive('angularSlider', ['$swipe', function($swipe) {
         return {
             restrict: 'E',
             replace: true,
@@ -47,10 +47,10 @@ angular.module('angular-slider', [])
                                         ") must be a rational divisor of the slider's range (" +
                                         (scope.max - scope.min) + ")");
                         }
-                        else if(handleValue.value % handleValue.step !== 0) {
+                        else if((handleValue.value - scope.min) % handleValue.step !== 0) {
                             console.log("The handle's step value (" + handleValue.step +
-                                        ") must be a rational divisor of the handle's value (" +
-                                        handleValue.value + ")");
+                                        ") must be a rational divisor of the handle's value, relative to the slider's " +
+                                        "minimum value (" + (handleValue.value - scope.min) + ")");
                         }
                         console.log("The handle's step value is being reset to 1");
                         handleValue.step = 1;
@@ -62,51 +62,48 @@ angular.module('angular-slider', [])
                         setHandlePositionByValue(sliderHandle, handleValue.value);
                     });
 
-                    sliderHandle.on('mousedown', function(event) {
-                        if(event.button !== 0){
-                            return;
+                    $swipe.bind(sliderHandle, {
+                        start: function(coords){
+                        },
+                        move: function(coords){
+                            swipeMove(coords.x);
+                        },
+                        end: function(){
+                        },
+                        cancel: function(){
                         }
-                        // Prevent default dragging of selected content
-                        event.preventDefault();
-                        $document.on('mousemove', mousemove);
-                        $document.on('mouseup', mouseup);
                     });
 
-                    function mousemove(event) {
-                        if(event.pageX === sliderHandle.prevPageX){
+                    function swipeMove(pageX) {
+                        if(pageX === sliderHandle.prevPageX){
                             return;
                         }
-                        var movingLeft = event.pageX < sliderHandle.prevPageX;
-                        if((movingLeft && (sliderRangeElement.prop('offsetLeft') > event.pageX)) ||
-                            (sliderRangeElement.prop('offsetLeft') + sliderRangeElement.prop('clientWidth')) < event.pageX){
+                        var movingLeft = pageX < sliderHandle.prevPageX;
+                        if((movingLeft && (sliderRangeElement.prop('offsetLeft') > pageX)) ||
+                            (sliderRangeElement.prop('offsetLeft') + sliderRangeElement.prop('clientWidth')) < pageX){
                             return;
                         }
 
                         var prevSlider = sliderHandle.handleIndex > 0 ? sliderHandles[sliderHandle.handleIndex - 1] : undefined;
                         var nextSlider = sliderHandle.handleIndex < (sliderHandles.length - 1) ? sliderHandles[sliderHandle.handleIndex + 1] : undefined;
 
-                        if((movingLeft && (angular.isDefined(prevSlider) && prevSlider.prevPageX >= event.x)) ||
-                           (angular.isDefined(nextSlider) && nextSlider.prevPageX <= event.x)){
+                        if((movingLeft && (angular.isDefined(prevSlider) && prevSlider.prevPageX >= pageX)) ||
+                            (angular.isDefined(nextSlider) && nextSlider.prevPageX <= pageX)){
                             return;
                         }
 
-                        var newValue = Math.round(getValueByPosition(event.pageX - sliderRangeElement.prop('offsetLeft')));
+                        var newValue = Math.round(getValueByPosition(pageX - sliderRangeElement.prop('offsetLeft')));
                         if((newValue % handleValue.step) !== 0) {
                             return;
                         }
-                        sliderHandle.x = Math.round(event.pageX - (sliderHandle.prop('clientWidth') / 2));
+                        sliderHandle.x = Math.round(pageX - (sliderHandle.prop('clientWidth') / 2));
                         sliderHandle.css({
                             left:  sliderHandle.x + 'px'
                         });
-                        sliderHandle.prevPageX = event.pageX;
+                        sliderHandle.prevPageX = pageX;
                         handleValue.value = newValue;
                         // force the application of the scope.handleValues[].value update
                         scope.$apply('handleValue.value');
-                    }
-
-                    function mouseup() {
-                        $document.off('mousemove', mousemove);
-                        $document.off('mouseup', mouseup);
                     }
                 });
 
