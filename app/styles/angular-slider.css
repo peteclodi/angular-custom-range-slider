@@ -1,3 +1,8 @@
+.angular-slider {
+    touch-action: none;
+    -ms-touch-action: none;
+}
+
 .angular-slider-range {
     border: solid 1px #999999;
     border-radius: 3px;
