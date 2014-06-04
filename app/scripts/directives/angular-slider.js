@@ -46,7 +46,6 @@ angular.module('angular-slider', [])
                             .addClass(sliderHandleClass)
                             .addClass(sliderHandleClass + "-" + index);
                     sliderHandle.handleIndex = index;
-                    sliderRangeElement.append(sliderHandle);
                     sliderHandles.push(sliderHandle);
                     handleValue.sliderHandle = sliderHandle;
 
@@ -55,30 +54,16 @@ angular.module('angular-slider', [])
                         var sliderInnerRangeElement =
                             angular.element("<div></div>")
                                 .addClass(sliderInnerRangeClass)
-                                .addClass(sliderInnerRangeClass + "-" + sliderInnerRangeIndex++)
-                                .css({
-                                    position: "absolute"
-                                });
+                                .addClass(sliderInnerRangeClass + "-" + sliderInnerRangeIndex++);
                         sliderRangeElement.append(sliderInnerRangeElement);
-                        sliderHandle.innerRangeElement = sliderInnerRangeElement;
+                        sliderHandle.nextInnerRangeElement = sliderInnerRangeElement;
                     }
 
-                    if(angular.isUndefined(handleValue.step) ||
-                        ((scope.max - scope.min) % handleValue.step !== 0) ||
-                        (handleValue.value % handleValue.step !== 0)) {
-                        if((scope.max - scope.min) % handleValue.step !== 0) {
-                            console.log("The handle's step value (" + handleValue.step +
-                                        ") must be a rational divisor of the slider's range (" +
-                                        (scope.max - scope.min) + ")");
-                        }
-                        else if((handleValue.value - scope.min) % handleValue.step !== 0) {
-                            console.log("The handle's step value (" + handleValue.step +
-                                        ") must be a rational divisor of the handle's value, relative to the slider's " +
-                                        "minimum value (" + (handleValue.value - scope.min) + ")");
-                        }
-                        console.log("The handle's step value is being reset to 1");
-                        handleValue.step = 1;
+                    if(index > 0){
+                        sliderHandle.prevInnerRangeElement = sliderHandles[index - 1].nextInnerRangeElement;
                     }
+
+                    validateHandleSteppingValue(handleValue);
 
                     handleValue.displayValue = formatTickValue(handleValue.value);
 
@@ -126,8 +111,26 @@ angular.module('angular-slider', [])
                         }
                         sliderHandle.x = Math.round(pageX - (sliderHandle.prop('clientWidth') / 2));
                         sliderHandle.css({
-                            left:  sliderHandle.x + 'px'
+                            left: sliderHandle.x + 'px'
                         });
+
+                        if(angular.isDefined(sliderHandle.nextInnerRangeElement)){
+                            sliderHandle.nextInnerRangeElement.css({
+                                left: pageX + 'px'
+                            });
+                            if(sliderHandle.handleIndex < (sliderHandles.length - 1)){
+                                var width = sliderHandles[sliderHandle.handleIndex + 1].prevPageX - pageX;
+                                sliderHandle.nextInnerRangeElement.css({
+                                    width: width + 'px'
+                                });
+                            }
+                        }
+                        if(angular.isDefined(sliderHandle.prevInnerRangeElement) && sliderHandle.handleIndex > 0){
+                            var width = pageX - sliderHandles[sliderHandle.handleIndex - 1].prevPageX;
+                            sliderHandle.prevInnerRangeElement.css({
+                                width: width + 'px'
+                            });
+                        }
                         sliderHandle.prevPageX = pageX;
                         handleValue.value = newValue;
                         handleValue.displayValue = formatTickValue(handleValue.value);
@@ -136,6 +139,32 @@ angular.module('angular-slider', [])
                         scope.$apply('handleValue.value');
                     }
                 });
+
+                // Don't add the slider handles to the DOM until after they all have been created
+                // This will create them at the top of the Z-Order and the drawing will be as expected
+                sliderHandles.forEach(function(sliderHandle){
+                    sliderRangeElement.append(sliderHandle);
+                });
+
+
+                function validateHandleSteppingValue(handleValue){
+                    if(angular.isUndefined(handleValue.step) ||
+                        ((scope.max - scope.min) % handleValue.step !== 0) ||
+                        (handleValue.value % handleValue.step !== 0)) {
+                        if((scope.max - scope.min) % handleValue.step !== 0) {
+                            console.log("The handle's step value (" + handleValue.step +
+                                ") must be a rational divisor of the slider's range (" +
+                                (scope.max - scope.min) + ")");
+                        }
+                        else if((handleValue.value - scope.min) % handleValue.step !== 0) {
+                            console.log("The handle's step value (" + handleValue.step +
+                                ") must be a rational divisor of the handle's value, relative to the slider's " +
+                                "minimum value (" + (handleValue.value - scope.min) + ")");
+                        }
+                        console.log("The handle's step value is being reset to 1");
+                        handleValue.step = 1;
+                    }
+                }
 
                 function calculateXForValue(value){
                     return Math.round((sliderRangeElement.prop('clientWidth') * ((value - scope.min) / (scope.max - scope.min))) + sliderRangeElement.prop('offsetLeft'));
@@ -155,6 +184,19 @@ angular.module('angular-slider', [])
                     handle.css({
                         left:  handle.x + 'px'
                     });
+
+                    var innerRangeX = calculateXForValue(value);
+                    if(angular.isDefined(handle.nextInnerRangeElement)){
+                        handle.nextInnerRangeElement.css({
+                            left: innerRangeX + 'px'
+                        });
+                    }
+                    if(angular.isDefined(handle.prevInnerRangeElement) && handle.handleIndex > 0){
+                        var width = innerRangeX - sliderHandles[handle.handleIndex - 1].prevPageX;
+                        handle.prevInnerRangeElement.css({
+                            width: width + 'px'
+                        });
+                    }
                     return handle.x;
                 }
 

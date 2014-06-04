@@ -26,6 +26,7 @@
 .angular-slider-inner-range {
     background: #3233b3;
     height: 25px;
+    position: absolute;
 }
 
 .angular-slider-value {
