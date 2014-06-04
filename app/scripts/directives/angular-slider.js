@@ -6,9 +6,6 @@ angular.module('angular-slider', [])
             restrict: 'E',
             replace: true,
             scope: {
-                min: '=',
-                max: '=',
-                step: '@',
                 tickToFormatted: '&',
                 formattedToTick: '&',
                 isValidFormattedValue: '&',
@@ -16,12 +13,37 @@ angular.module('angular-slider', [])
             },
             templateUrl: 'views/angular-slider.html',
             link: function(scope, element, attrs){
-                scope.showTicks = angular.isDefined(attrs.showTicks);
-                scope.showValues = angular.isDefined(attrs.showValues);
+                scope.min = angular.isDefined(attrs.min) ? +attrs.min : 0;
+                scope.max = angular.isDefined(attrs.max) ? +attrs.max : 100;
 
-                var inputSections = scope.handleValues.length < 3 ? 4 : Math.max(scope.handleValues.length, 3);
-                var inputSectionOffset = scope.handleValues.length >= 3 ? 2.25 : 0;
-                scope.inputWidths = Math.round(((1 / inputSections) * 100) - inputSectionOffset) + '%';
+                scope.showTicks = angular.isDefined(attrs.showTicks);
+                scope.showValues = angular.isDefined(attrs.showValues) && angular.isDefined(attrs.handleValues);
+
+                if(angular.isUndefined(attrs.tickToFormatted)){
+                    // When the real call is made and thrown over the wall to the parent scope
+                    // the {value: xxxxx} object is broken out to just pass xxxxx to the function
+                    // Because the magic is not being done as it is not being thrown over the wall
+                    // it is necessary to reference the object's value property
+                    scope.tickToFormatted = function(tickValue) { return tickValue.value; };
+                }
+
+                if(angular.isUndefined(attrs.formattedToTick)){
+                    // When the real call is made and thrown over the wall to the parent scope
+                    // the {value: xxxxx} object is broken out to just pass xxxxx to the function
+                    // Because the magic is not being done as it is not being thrown over the wall
+                    // it is necessary to reference the object's value property
+                    scope.formattedToTick = function(displayValue) { return displayValue.value; };
+                }
+
+                if(angular.isUndefined(attrs.isValidFormattedValue)){
+                    scope.isValidFormattedValue = function() { return true; };
+                }
+
+                if(scope.showValues){
+                    var inputSections = scope.handleValues.length < 3 ? 4 : Math.max(scope.handleValues.length, 3);
+                    var inputSectionOffset = scope.handleValues.length >= 3 ? 2.25 : 0;
+                    scope.inputWidths = Math.round(((1 / inputSections) * 100) - inputSectionOffset) + '%';
+                }
 
                 var sliderRangeElement = undefined;
                 angular.forEach(element.children(),
@@ -35,6 +57,13 @@ angular.module('angular-slider', [])
 
                 if(scope.showTicks){
                     generateTickMarks();
+                }
+
+                // Allow the slider control to be initialized with min, max and tick values
+                // before verifying that handle values have been defined.
+                if(angular.isUndefined(attrs.handleValues)){
+                    console.log("handle-values MUST be defined within the tag");
+                    return;
                 }
 
                 var sliderHandles = [];
