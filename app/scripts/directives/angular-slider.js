@@ -47,6 +47,7 @@ angular.module('angular-slider', [])
                             .addClass(sliderHandleClass + "-" + index);
                     sliderHandle.handleIndex = index;
                     sliderHandles.push(sliderHandle);
+                    sliderHandle.getHandleOffset = function(){ return this.prop('clientWidth') / 2; };
                     handleValue.sliderHandle = sliderHandle;
 
                     if(index < (scope.handleValues.length -1)){
@@ -100,8 +101,10 @@ angular.module('angular-slider', [])
                         var prevSlider = sliderHandle.handleIndex > 0 ? sliderHandles[sliderHandle.handleIndex - 1] : undefined;
                         var nextSlider = sliderHandle.handleIndex < (sliderHandles.length - 1) ? sliderHandles[sliderHandle.handleIndex + 1] : undefined;
 
-                        if((movingLeft && (angular.isDefined(prevSlider) && prevSlider.prevPageX >= pageX)) ||
-                            (angular.isDefined(nextSlider) && nextSlider.prevPageX <= pageX)){
+                        var pageXWithHandleOffset = movingLeft ? pageX -sliderHandle.getHandleOffset() : pageX + sliderHandle.getHandleOffset();
+
+                        if((movingLeft && (angular.isDefined(prevSlider) && (prevSlider.prevPageX + prevSlider.getHandleOffset()) >= pageXWithHandleOffset)) ||
+                            (angular.isDefined(nextSlider) && (nextSlider.prevPageX - nextSlider.getHandleOffset()) <= pageXWithHandleOffset)){
                             return;
                         }
 
@@ -109,7 +112,7 @@ angular.module('angular-slider', [])
                         if((newValue % handleValue.step) !== 0) {
                             return;
                         }
-                        sliderHandle.x = Math.round(pageX - (sliderHandle.prop('clientWidth') / 2));
+                        sliderHandle.x = Math.round(pageX - sliderHandle.getHandleOffset());
                         sliderHandle.css({
                             left: sliderHandle.x + 'px'
                         });
@@ -118,15 +121,15 @@ angular.module('angular-slider', [])
                             sliderHandle.nextInnerRangeElement.css({
                                 left: pageX + 'px'
                             });
-                            if(sliderHandle.handleIndex < (sliderHandles.length - 1)){
-                                var width = sliderHandles[sliderHandle.handleIndex + 1].prevPageX - pageX;
+                            if(angular.isDefined(nextSlider)){
+                                var width = nextSlider.prevPageX - pageX;
                                 sliderHandle.nextInnerRangeElement.css({
                                     width: width + 'px'
                                 });
                             }
                         }
-                        if(angular.isDefined(sliderHandle.prevInnerRangeElement) && sliderHandle.handleIndex > 0){
-                            var width = pageX - sliderHandles[sliderHandle.handleIndex - 1].prevPageX;
+                        if(angular.isDefined(sliderHandle.prevInnerRangeElement) && angular.isDefined(prevSlider)){
+                            var width = pageX - prevSlider.prevPageX;
                             sliderHandle.prevInnerRangeElement.css({
                                 width: width + 'px'
                             });
@@ -171,7 +174,7 @@ angular.module('angular-slider', [])
                 }
 
                 function calculateHandleXAtValue(handle, value){
-                    return calculateXForValue(value) - (handle.prop('clientWidth') / 2);
+                    return calculateXForValue(value) - handle.getHandleOffset();
                 }
 
                 function updateSliderHandleElement(sliderHandle, value){

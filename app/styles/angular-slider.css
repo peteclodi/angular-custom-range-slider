@@ -4,6 +4,8 @@
 }
 
 .angular-slider-range {
+    touch-action: none;
+    -ms-touch-action: none;
     border: solid 1px #999999;
     border-radius: 3px;
     background: #b3b3b3;
@@ -13,6 +15,8 @@
 }
 
 .angular-slider-handle {
+    touch-action: none;
+    -ms-touch-action: none;
     border: solid 1px #999999;
     border-radius: 3px;
     background: #dddddd;
