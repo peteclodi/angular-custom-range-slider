@@ -55,4 +55,4 @@ Some of these values are self explanatory when it comes to a slider control, but
     The step value must also be evenly divisible into the associated value's offset from the slider control's minimum value as defined by {value - min} % step === 0
 
 ### Demo
-See the [demo](http://#) page for an illustration of some of the usages of the angular-custom-range-slider control
+See the [demo](http://peteclodi.com/code/angular-custom-range-slider/) page for an illustration of some of the usages of the angular-custom-range-slider control
