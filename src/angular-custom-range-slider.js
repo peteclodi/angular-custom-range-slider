@@ -11,7 +11,20 @@ angular.module('angular-custom-range-slider', [])
                 isValidFormattedValue: '&',
                 handleValues: "="
             },
-            templateUrl: 'views/angular-custom-range-slider.html',
+            template:
+                '<div class="angular-custom-range-slider">' +
+                    '<div class="angular-custom-range-slider-range"></div>' +
+                    '<div class="angular-custom-range-slider-values">' +
+                        '<input class="angular-custom-range-slider-value" ng-if="showValues "' +
+                            'ng-repeat="handleValue in handleValues" ' +
+                            'ng-class="{\'angular-custom-range-slider-first-value\': $first, ' +
+                            '\'angular-custom-range-slider-only-value\': $first && $last, ' +
+                            '\'angular-custom-range-slider-invalid-value\': !isValid(handleValue.displayValue)}" ' +
+                            'ng-style="$last && !$first ? {float: \'right\', ' +
+                            'width: \'{{inputWidths}}\'} : !($last && $first) ? {width: \'{{inputWidths}}\'}: {} "' +
+                            'ng-change="handleValueChanged(handleValue)" ng-model="handleValue.displayValue"/>' +
+                    '</div>' +
+                '</div>',
             link: function(scope, element, attrs){
                 scope.min = angular.isDefined(attrs.min) ? +attrs.min : 0;
                 scope.max = angular.isDefined(attrs.max) ? +attrs.max : 100;
