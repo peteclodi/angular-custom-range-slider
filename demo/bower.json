@@ -2,6 +2,6 @@
     "name": "angular-custom-range-slider-demo",
     "version": "0.0.1",
     "dependencies": {
-        "angular-custom-range-slider": "0.0.1"
+        "angular-custom-range-slider": "0.0.2"
     }
 }
