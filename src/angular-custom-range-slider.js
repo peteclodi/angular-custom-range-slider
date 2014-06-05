@@ -11,7 +11,7 @@ angular.module('angular-slider', [])
                 isValidFormattedValue: '&',
                 handleValues: "="
             },
-            templateUrl: 'views/angular-slider.html',
+            templateUrl: 'views/angular-custom-range-slider.html',
             link: function(scope, element, attrs){
                 scope.min = angular.isDefined(attrs.min) ? +attrs.min : 0;
                 scope.max = angular.isDefined(attrs.max) ? +attrs.max : 100;
