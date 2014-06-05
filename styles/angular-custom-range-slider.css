@@ -1,9 +1,9 @@
-.angular-slider {
+.angular-custom-range-slider {
     touch-action: none;
     -ms-touch-action: none;
 }
 
-.angular-slider-range {
+.angular-custom-range-slider-range {
     touch-action: none;
     -ms-touch-action: none;
     border: solid 1px #999999;
@@ -14,7 +14,7 @@
     height: 25px;
 }
 
-.angular-slider-handle {
+.angular-custom-range-slider-handle {
     touch-action: none;
     -ms-touch-action: none;
     border: solid 1px #999999;
@@ -27,39 +27,39 @@
     height: 35px;
 }
 
-.angular-slider-inner-range {
+.angular-custom-range-slider-inner-range {
     background: #3233b3;
     height: 25px;
     position: absolute;
 }
 
-.angular-slider-value {
+.angular-custom-range-slider-value {
     float: left;
     margin: 50px 0 0 12px;
     font-size: 16px;
     text-align: right;
 }
 
-.angular-slider-first-value {
+.angular-custom-range-slider-first-value {
     margin-left: 0;
 }
 
-.angular-slider-only-value {
+.angular-custom-range-slider-only-value {
     width: 25%;
 }
 
-.angular-slider-invalid-value {
+.angular-custom-range-slider-invalid-value {
     border-color: #843534;
     color: #843534;
     outline-color: #ff8787;
 }
 
-.angular-slider-values {
+.angular-custom-range-slider-values {
     margin-left: 7.5%;
     width: 85%
 }
 
-.angular-slider-tick {
+.angular-custom-range-slider-tick {
     position: absolute;
     margin-top: 25px;
 }

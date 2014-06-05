@@ -6,7 +6,7 @@
         "peteclodi <pete.clodi@gmail.com>"
     ],
     "description": "A range slider directive using only Angular.js with no jQuery dependencies",
-    "main": "src/angular-slider.js",
+    "main": "src/angular-custom-range-slider.js",
     "keywords": [
         "angular",
         "slider",

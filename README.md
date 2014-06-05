@@ -1,4 +1,4 @@
-# angular-slider
+# angular-custom-range-slider
 ==============
 This is a slider control written using only [Angular.js](http://angularjs.org/) with no dependency on [jQuery](http://jquery.com/).
 
@@ -21,15 +21,15 @@ This control provides the basic functionality that is expected of a slider contr
 * Both Common and Individual classes for the styling of the ranges between drag handles
 * User customizable value formatting to allow for any style of display for the raw values used within the control
 
-## Using angular-slider in your project
+## Using angular-custom-range-slider in your project
 
 ### Installing from Bower
     **add Bower install instructions once Bower support is added**
 
 ### Using with your code
-    <angular-slider min="20" max="80" handle-values="sliderValues" show-values show-ticks
+    <angular-custom-range-slider min="20" max="80" handle-values="sliderValues" show-values show-ticks
                     is-valid-formatted_value="isValidFormattedValue(value)" formatted-to-tick="formattedToTick(value)"
-                    tick-to-formatted="tickToFormatted(value)"></angular-slider>
+                    tick-to-formatted="tickToFormatted(value)"></angular-custom-range-slider>
 
 Some of these values are self explanatory when it comes to a slider control, but I will explain each settings anyway just in case.
 
@@ -55,4 +55,4 @@ Some of these values are self explanatory when it comes to a slider control, but
     The step value must also be evenly divisible into the associated value's offset from the slider control's minimum value as defined by {value - min} % step === 0
 
 ### Demo
-See the [demo](http://#) page for an illustration of some of the usages of the angular-slider control
+See the [demo](http://#) page for an illustration of some of the usages of the angular-custom-range-slider control

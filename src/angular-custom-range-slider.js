@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('angular-slider', [])
-    .directive('angularSlider', ['$swipe', function($swipe) {
+angular.module('angular-custom-range-slider', [])
+    .directive('angularCustomRangeSlider', ['$swipe', function($swipe) {
         return {
             restrict: 'E',
             replace: true,
@@ -50,7 +50,7 @@ angular.module('angular-slider', [])
                     function(child){
                         if(angular.isDefined(sliderRangeElement)){ return; }
                         var angularChild = angular.element(child);
-                        if(angularChild.hasClass('angular-slider-range')){
+                        if(angularChild.hasClass('angular-custom-range-slider-range')){
                             sliderRangeElement = angularChild;
                         }
                     });
@@ -70,7 +70,7 @@ angular.module('angular-slider', [])
                 var sliderInnerRangeIndex = 0;
                 var draggedSliderHandle = undefined;
                 scope.handleValues.forEach(function(handleValue, index){
-                    var sliderHandleClass = "angular-slider-handle";
+                    var sliderHandleClass = "angular-custom-range-slider-handle";
                     var sliderHandle =
                         angular.element("<div></div>")
                             .addClass(sliderHandleClass)
@@ -81,7 +81,7 @@ angular.module('angular-slider', [])
                     handleValue.sliderHandle = sliderHandle;
 
                     if(index < (scope.handleValues.length -1)){
-                        var sliderInnerRangeClass = "angular-slider-inner-range";
+                        var sliderInnerRangeClass = "angular-custom-range-slider-inner-range";
                         var sliderInnerRangeElement =
                             angular.element("<div></div>")
                                 .addClass(sliderInnerRangeClass)
@@ -252,7 +252,7 @@ angular.module('angular-slider', [])
                     for(var tick = 0; tick < 5; ++tick){
                         var tickValue = scope.min + (rangePerTick * tick);
                         var tickElement = angular.element("<span></span>")
-                            .addClass("angular-slider-tick")
+                            .addClass("angular-custom-range-slider-tick")
                             .css({top: (sliderRangeElement.prop('offsetTop') + sliderRangeElement.prop('offsetHeight')) + 'px'});
                         tickElement.text(formatTickValue(tickValue));
                         tickElement.prop('tickValue', tickValue);
