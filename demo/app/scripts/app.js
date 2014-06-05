@@ -4,7 +4,7 @@ angular
   .module('angularSliderApp', [
     'ngRoute',
     'ngTouch',
-    'angular-slider'
+    'angular-custom-range-slider'
   ])
   .config(function ($routeProvider) {
     $routeProvider
