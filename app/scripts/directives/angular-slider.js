@@ -68,6 +68,7 @@ angular.module('angular-slider', [])
 
                 var sliderHandles = [];
                 var sliderInnerRangeIndex = 0;
+                var draggedSliderHandle = undefined;
                 scope.handleValues.forEach(function(handleValue, index){
                     var sliderHandleClass = "angular-slider-handle";
                     var sliderHandle =
@@ -104,72 +105,24 @@ angular.module('angular-slider', [])
 
                     $swipe.bind(sliderHandle, {
                         start: function(coords){
-                            console.log("$swipe.start: (" + coords.x + "," + coords.y + ")");
+                            draggedSliderHandle = sliderHandle;
                         },
-                        move: function(coords){
-                            console.log("$swipe.move: (" + coords.x + "," + coords.y + ")");
-                            swipeMove(coords.x);
-                        },
-                        end: function(){
-                            console.log("$swipe.end");
-                        },
-                        cancel: function(){
+                        end: function(coords){
+                            draggedSliderHandle = undefined;
                         }
                     });
-
-                    function swipeMove(pageX) {
-                        if(pageX === sliderHandle.prevPageX){
-                            return;
-                        }
-                        var movingLeft = pageX < sliderHandle.prevPageX;
-                        if((movingLeft && (sliderRangeElement.prop('offsetLeft') > pageX)) ||
-                            (sliderRangeElement.prop('offsetLeft') + sliderRangeElement.prop('clientWidth')) < pageX){
-                            return;
-                        }
-
-                        var prevSlider = sliderHandle.handleIndex > 0 ? sliderHandles[sliderHandle.handleIndex - 1] : undefined;
-                        var nextSlider = sliderHandle.handleIndex < (sliderHandles.length - 1) ? sliderHandles[sliderHandle.handleIndex + 1] : undefined;
-
-                        var pageXWithHandleOffset = movingLeft ? pageX -sliderHandle.getHandleOffset() : pageX + sliderHandle.getHandleOffset();
-
-                        if((movingLeft && (angular.isDefined(prevSlider) && (prevSlider.prevPageX + prevSlider.getHandleOffset()) >= pageXWithHandleOffset)) ||
-                            (angular.isDefined(nextSlider) && (nextSlider.prevPageX - nextSlider.getHandleOffset()) <= pageXWithHandleOffset)){
-                            return;
-                        }
-
-                        var newValue = Math.round(getValueByPosition(pageX - sliderRangeElement.prop('offsetLeft')));
-                        if((newValue % handleValue.step) !== 0) {
-                            return;
-                        }
-                        sliderHandle.x = Math.round(pageX - sliderHandle.getHandleOffset());
-                        sliderHandle.css({
-                            left: sliderHandle.x + 'px'
-                        });
-
-                        if(angular.isDefined(sliderHandle.nextInnerRangeElement)){
-                            sliderHandle.nextInnerRangeElement.css({
-                                left: pageX + 'px'
-                            });
-                            if(angular.isDefined(nextSlider)){
-                                var width = nextSlider.prevPageX - pageX;
-                                sliderHandle.nextInnerRangeElement.css({
-                                    width: width + 'px'
-                                });
+                    $swipe.bind(sliderRangeElement, {
+                        move: function(coords){
+                            if(angular.isDefined(draggedSliderHandle)){
+                                swipeMove(draggedSliderHandle, coords.x);
+                            }
+                        },
+                        end: function(){
+                            if(angular.isDefined(draggedSliderHandle)){
+                                draggedSliderHandle = undefined;
                             }
                         }
-                        if(angular.isDefined(sliderHandle.prevInnerRangeElement) && angular.isDefined(prevSlider)){
-                            var width = pageX - prevSlider.prevPageX;
-                            sliderHandle.prevInnerRangeElement.css({
-                                width: width + 'px'
-                            });
-                        }
-                        sliderHandle.prevPageX = pageX;
-                        handleValue.value = newValue;
-                        handleValue.displayValue = formatTickValue(handleValue.value);
-
-                        // force the application of the scope.handleValues[].value update
-                        scope.$apply('handleValue.value');
-                    }
+                    });
                 });
 
                 // Don't add the slider handles to the DOM until after they all have been created
@@ -178,6 +131,61 @@ angular.module('angular-slider', [])
                     sliderRangeElement.append(sliderHandle);
                 });
 
+
+                function swipeMove(draggedHandle, pageX) {
+                    if(pageX === draggedHandle.prevPageX){
+                        return;
+                    }
+                    var movingLeft = pageX < draggedHandle.prevPageX;
+                    if((movingLeft && (sliderRangeElement.prop('offsetLeft') > pageX)) ||
+                        (sliderRangeElement.prop('offsetLeft') + sliderRangeElement.prop('clientWidth')) < pageX){
+                        return;
+                    }
+
+                    var draggedHandleValue = scope.handleValues[draggedHandle.handleIndex];
+                    var prevSlider = draggedHandle.handleIndex > 0 ? sliderHandles[draggedHandle.handleIndex - 1] : undefined;
+                    var nextSlider = draggedHandle.handleIndex < (sliderHandles.length - 1) ? sliderHandles[draggedHandle.handleIndex + 1] : undefined;
+
+                    var pageXWithHandleOffset = movingLeft ? pageX -draggedHandle.getHandleOffset() : pageX + draggedHandle.getHandleOffset();
+
+                    if((movingLeft && (angular.isDefined(prevSlider) && (prevSlider.prevPageX + prevSlider.getHandleOffset()) >= pageXWithHandleOffset)) ||
+                        (angular.isDefined(nextSlider) && (nextSlider.prevPageX - nextSlider.getHandleOffset()) <= pageXWithHandleOffset)){
+                        return;
+                    }
+
+                    var newValue = Math.round(getValueByPosition(pageX - sliderRangeElement.prop('offsetLeft')));
+                    if((newValue % draggedHandleValue.step) !== 0) {
+                        return;
+                    }
+                    draggedHandle.x = Math.round(pageX - draggedHandle.getHandleOffset());
+                    draggedHandle.css({
+                        left: draggedHandle.x + 'px'
+                    });
+
+                    if(angular.isDefined(draggedHandle.nextInnerRangeElement)){
+                        draggedHandle.nextInnerRangeElement.css({
+                            left: pageX + 'px'
+                        });
+                        if(angular.isDefined(nextSlider)){
+                            var width = nextSlider.prevPageX - pageX;
+                            draggedHandle.nextInnerRangeElement.css({
+                                width: width + 'px'
+                            });
+                        }
+                    }
+                    if(angular.isDefined(draggedHandle.prevInnerRangeElement) && angular.isDefined(prevSlider)){
+                        var width = pageX - prevSlider.prevPageX;
+                        draggedHandle.prevInnerRangeElement.css({
+                            width: width + 'px'
+                        });
+                    }
+                    draggedHandle.prevPageX = pageX;
+                    draggedHandleValue.value = newValue;
+                    draggedHandleValue.displayValue = formatTickValue(draggedHandleValue.value);
+
+                    // force the application of the scope.handleValues[].value update
+                    scope.$apply('draggedHandleValue.value');
+                }
 
                 function validateHandleSteppingValue(handleValue){
                     if(angular.isUndefined(handleValue.step) ||
