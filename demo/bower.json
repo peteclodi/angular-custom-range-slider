@@ -2,6 +2,7 @@
     "name": "angular-custom-range-slider-demo",
     "version": "1.0.0",
     "dependencies": {
-        "angular-custom-range-slider": "1.0.*"
+        "angular-custom-range-slider": "1.0.*",
+        "angular-route": "~1.2"
     }
 }

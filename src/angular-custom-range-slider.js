@@ -121,6 +121,9 @@ angular.module('angular-custom-range-slider', [])
                             draggedSliderHandle = sliderHandle;
                         },
                         end: function(coords){
+                            if(angular.isDefined(draggedSliderHandle)){
+                                snapHandleToStepIncrement(draggedSliderHandle);
+                            }
                             draggedSliderHandle = undefined;
                         }
                     });
@@ -132,6 +135,7 @@ angular.module('angular-custom-range-slider', [])
                         },
                         end: function(){
                             if(angular.isDefined(draggedSliderHandle)){
+                                snapHandleToStepIncrement(draggedSliderHandle);
                                 draggedSliderHandle = undefined;
                             }
                         }
@@ -166,10 +170,6 @@ angular.module('angular-custom-range-slider', [])
                         return;
                     }
 
-                    var newValue = Math.round(getValueByPosition(pageX - sliderRangeElement.prop('offsetLeft')));
-                    if((newValue % draggedHandleValue.step) !== 0) {
-                        return;
-                    }
                     draggedHandle.x = Math.round(pageX - draggedHandle.getHandleOffset());
                     draggedHandle.css({
                         left: draggedHandle.x + 'px'
@@ -193,11 +193,43 @@ angular.module('angular-custom-range-slider', [])
                         });
                     }
                     draggedHandle.prevPageX = pageX;
+                    var newValue = Math.round(getValueByPosition(pageX - sliderRangeElement.prop('offsetLeft')));
+                    if((newValue % draggedHandleValue.step) !== 0) {
+                        return;
+                    }
                     draggedHandleValue.value = newValue;
                     draggedHandleValue.displayValue = formatTickValue(draggedHandleValue.value);
 
                     // force the application of the scope.handleValues[].value update
                     scope.$apply('draggedHandleValue.value');
+                }
+
+                function snapHandleToStepIncrement(draggedSliderHandle){
+                    var draggedHandleValue = scope.handleValues[draggedSliderHandle.handleIndex];
+                    var valueX = calculateXForValue(draggedHandleValue.value);
+                    var leftOfHandle = draggedSliderHandle.prevPageX < valueX;
+
+                    if(leftOfHandle){
+                        var prevValue = Math.max(draggedHandleValue.value - draggedHandleValue.step, scope.min);
+                        var prevValueX = calculateXForValue(prevValue);
+                        var valueXDistanceRoundingPoint = Math.floor((valueX - prevValueX) / 2);
+                        if(draggedSliderHandle.prevPageX < (prevValueX + valueXDistanceRoundingPoint)){
+                            swipeMove(draggedSliderHandle, prevValueX);
+                        }else{
+                            swipeMove(draggedSliderHandle, valueX);
+                        }
+                    }else{
+                        var nextValue = Math.min(draggedHandleValue.value + draggedHandleValue.step, scope.max);
+                        var nextValueX = calculateXForValue(nextValue);
+                        var valueXDistanceRoundingPoint = Math.floor((nextValueX - valueX) / 2);
+                        if(draggedSliderHandle.prevPageX > (nextValueX - valueXDistanceRoundingPoint)){
+                            swipeMove(draggedSliderHandle, nextValueX);
+                        }else{
+                            swipeMove(draggedSliderHandle, valueX);
+                        }
+                    }
+
+
                 }
 
                 function validateHandleSteppingValue(handleValue){
