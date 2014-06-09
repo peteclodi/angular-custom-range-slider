@@ -11,9 +11,9 @@
         "directive"
     ],
     "dependencies": {
-        "angular": "1.2.16",
-        "angular-route": "1.2.16",
-        "angular-touch": "1.2.16"
+        "angular": "~1.2.16",
+        "angular-route": "~1.2.16",
+        "angular-touch": "~1.2.16"
     },
     "license": "MIT",
     "ignore": [
