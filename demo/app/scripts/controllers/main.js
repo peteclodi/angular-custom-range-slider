@@ -7,7 +7,7 @@ angular.module('angularSliderApp')
             'AngularJS',
             'Karma'
         ];
-        $scope.simpleSliderValues = [{value: 25, step: 1}];
+        $scope.simpleSliderValues = [{value: 1025, step: 1}];
         $scope.rangeSliderValues = [{value: 25, step: 1}, {value: 75, step: 5}];
         $scope.complexRangeSliderValues = [{value: 25, step: 1}, {value: 50, step: 1}, {value: 75, step: 5}];
         $scope.veryComplexRangeSliderValues = [{value: 25, step: 1}, {value: 35, step: 1}, {value: 45, step: 5},{value: 55, step: 1}, {value: 65, step: 1}, {value: 75, step: 5}];
@@ -18,7 +18,8 @@ angular.module('angularSliderApp')
         };
 
         $scope.formattedToTick = function(displayValue){
-            return Math.round(+(displayValue.split('$').join('')));
+            // Strip out the $ and , from the currency value
+            return Math.round(+(displayValue.split('$').join('').split(',').join('')));
         };
 
         $scope.tickToFormatted = function(tickValue){
