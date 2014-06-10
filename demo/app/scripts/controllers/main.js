@@ -26,4 +26,8 @@ angular.module('angularSliderApp')
             // Ensure that the value is a number
             return (+tickValue).formatMoney();
         };
+
+        $scope.$on('dragEnd', function(event, args){
+            console.log('dragEnd');
+        });
     });

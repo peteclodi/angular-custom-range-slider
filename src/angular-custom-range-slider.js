@@ -123,8 +123,10 @@ angular.module('angular-custom-range-slider', [])
                         end: function(coords){
                             if(angular.isDefined(draggedSliderHandle)){
                                 snapHandleToStepIncrement(draggedSliderHandle);
+                                var dragEndArg = {valueIndex: draggedSliderHandle.handleIndex};
+                                draggedSliderHandle = undefined;
+                                scope.$emit('dragEnd', dragEndArg);
                             }
-                            draggedSliderHandle = undefined;
                         }
                     });
                     $swipe.bind(sliderRangeElement, {
@@ -136,7 +138,9 @@ angular.module('angular-custom-range-slider', [])
                         end: function(){
                             if(angular.isDefined(draggedSliderHandle)){
                                 snapHandleToStepIncrement(draggedSliderHandle);
+                                var dragEndArg = {valueIndex: draggedSliderHandle.handleIndex};
                                 draggedSliderHandle = undefined;
+                                scope.$emit('dragEnd', dragEndArg);
                             }
                         }
                     });
