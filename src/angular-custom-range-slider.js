@@ -327,6 +327,22 @@ angular.module('angular-custom-range-slider', [])
                     }
                 };
 
+                // handle any changes to the handleValues collection, this will capture any structural changes
+                // after the initialization of the directive
+                scope.$watchCollection('handleValues', function(newHandleValues, oldHandleValues){
+                    if(angular.equals(newHandleValues, oldHandleValues)) { return; }
+                    if(newHandleValues.length !== oldHandleValues.length) { return; }
+
+                    for(var index = 0; index < newHandleValues.length; ++index){
+                        angular.extend(newHandleValues[index], { sliderHandle: oldHandleValues[index].sliderHandle });
+                    }
+
+                    angular.forEach(newHandleValues, function(handleValue){
+                        handleValue.displayValue = formatTickValue(handleValue.value);
+                        updateSliderHandleElement(handleValue.sliderHandle, handleValue.value);
+                    });
+                });
+
                 scope.isValid = function(displayValue) {
                     if(scope.isValidFormattedValue({value: displayValue})){
                         var value = scope.formattedToTick({value: displayValue})
