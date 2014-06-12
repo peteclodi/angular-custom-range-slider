@@ -35,7 +35,7 @@
 
 .angular-custom-range-slider-value {
     float: left;
-    margin: 50px 0 0 12px;
+    margin: 40px 0 0 12px;
     font-size: 16px;
     text-align: right;
 }
@@ -56,7 +56,8 @@
 
 .angular-custom-range-slider-values {
     margin-left: 7.5%;
-    width: 85%
+    width: 85%;
+    height: 65px;
 }
 
 .angular-custom-range-slider-tick {
