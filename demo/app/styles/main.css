@@ -41,7 +41,23 @@ body {
     border-radius: 5px;
     box-shadow: 5px 5px 2px #808080;
     width: auto;
-    height: 200px;
+    height: 225px;
+}
+
+.slider-button-reset {
+    font-size: 16px;
+    margin: 10px 50px 0 0;
+    float: right;
+    border-radius: 6px;
+    background-color: #ffffff;
+    height: 35px;
+    padding: 0 10px;
+    border-style: solid;
+    border-color: #b3b3b3;
+}
+
+.ng-click-active {
+    border-style: inset;
 }
 
 .angular-custom-range-slider-range {
