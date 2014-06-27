@@ -18,7 +18,7 @@ angular.module('angular-custom-range-slider', [])
                 'ng-repeat="handleValue in handleValues" ' +
                 'ng-class="{\'angular-custom-range-slider-first-value\': $first, ' +
                 '\'angular-custom-range-slider-only-value\': $first && $last, ' +
-                '\'angular-custom-range-slider-invalid-value\': !isValid(handleValue.displayValue)}" ' +
+                '\'angular-custom-range-slider-invalid-value\': !isValid(handleValue)}" ' +
                 'ng-style="$last && !$first ? {float: \'right\', ' +
                 'width: \'{{inputWidths}}\'} : !($last && $first) ? {width: \'{{inputWidths}}\'}: {} "' +
                 'ng-change="handleValueChanged(handleValue)" ng-model="handleValue.displayValue"/>' +
@@ -205,16 +205,19 @@ angular.module('angular-custom-range-slider', [])
                             width: width + 'px'
                         });
                     }
-                    draggedHandle.prevPageX = pageX;
-                    var newValue = Math.round(getValueByPosition(pageX - sliderRangeElement.prop('offsetLeft')));
-                    if ((newValue % draggedHandleValue.step) !== 0) {
-                        return;
-                    }
-                    draggedHandleValue.value = newValue;
-                    draggedHandleValue.displayValue = formatTickValue(draggedHandleValue.value);
 
-                    // force the application of the scope.handleValues[].value update
-                    scope.$apply('draggedHandleValue.value');
+                    draggedHandle.prevPageX = pageX;
+
+                    var newValue = Math.round(getValueByPosition(pageX - sliderRangeElement.prop('offsetLeft')));
+
+                    if (valueOnStep(newValue, draggedHandleValue.step)) {
+                        // Only update the value properties if the new value lands on a valid stepping value
+                        draggedHandleValue.value = newValue;
+                        draggedHandleValue.displayValue = formatTickValue(draggedHandleValue.value);
+
+                        // force the application of the scope.handleValues[].value update
+                        scope.$apply('draggedHandleValue.value');
+                    }
                 }
 
                 function snapHandleToStepIncrement(draggedSliderHandle) {
@@ -331,9 +334,13 @@ angular.module('angular-custom-range-slider', [])
                     return scope.tickToFormatted({value: tickValue});
                 }
 
+                function valueOnStep(value, step) {
+                    return ((value % step) === 0);
+                }
+
                 scope.handleValueChanged = function (handleValue) {
                     // pass the value in as an object so that it will be properly marshaled to the parent controller
-                    if (scope.isValid(handleValue.displayValue)) {
+                    if (scope.isValid(handleValue)) {
                         handleValue.value = scope.formattedToTick({value: handleValue.displayValue});
                         updateSliderHandleElement(handleValue.sliderHandle, handleValue.value);
                     }
@@ -359,10 +366,19 @@ angular.module('angular-custom-range-slider', [])
                     });
                 });
 
-                scope.isValid = function (displayValue) {
-                    if (scope.isValidFormattedValue({value: displayValue})) {
-                        var value = scope.formattedToTick({value: displayValue})
-                        return (value >= scope.min && value <= scope.max);
+                scope.isValid = function (handleValue) {
+                    if (scope.isValidFormattedValue({value: handleValue.displayValue})) {
+                        var value = scope.formattedToTick({value: handleValue.displayValue});
+
+                        if (valueOnStep(value, handleValue.step)) {
+                            var currentHandleElement = handleValue.sliderHandle;
+                            var previousRangesValue = currentHandleElement.handleIndex > 0 ?
+                                scope.handleValues[currentHandleElement.handleIndex - 1].value : scope.min;
+                            var nextRangesValue = currentHandleElement.handleIndex < (scope.handleValues.length - 1) ?
+                                scope.handleValues[currentHandleElement.handleIndex + 1].value : scope.max;
+
+                            return value >= previousRangesValue && value <= nextRangesValue;
+                        }
                     }
                     return false;
                 }
