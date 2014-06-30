@@ -188,19 +188,20 @@ angular.module('angular-custom-range-slider', [])
                         left: draggedHandle.x + 'px'
                     });
 
+                    var width = 0;
                     if (angular.isDefined(draggedHandle.nextInnerRangeElement)) {
                         draggedHandle.nextInnerRangeElement.css({
                             left: pageX + 'px'
                         });
                         if (angular.isDefined(nextSlider)) {
-                            var width = nextSlider.prevPageX - pageX;
+                            width = nextSlider.prevPageX - pageX;
                             draggedHandle.nextInnerRangeElement.css({
                                 width: width + 'px'
                             });
                         }
                     }
                     if (angular.isDefined(draggedHandle.prevInnerRangeElement) && angular.isDefined(prevSlider)) {
-                        var width = pageX - prevSlider.prevPageX;
+                        width = pageX - prevSlider.prevPageX;
                         draggedHandle.prevInnerRangeElement.css({
                             width: width + 'px'
                         });
@@ -224,11 +225,12 @@ angular.module('angular-custom-range-slider', [])
                     var draggedHandleValue = scope.handleValues[draggedSliderHandle.handleIndex];
                     var valueX = calculateXForValue(draggedHandleValue.value);
                     var leftOfHandle = draggedSliderHandle.prevPageX < valueX;
+                    var valueXDistanceRoundingPoint = 0;
 
                     if (leftOfHandle) {
                         var prevValue = Math.max(draggedHandleValue.value - draggedHandleValue.step, scope.min);
                         var prevValueX = calculateXForValue(prevValue);
-                        var valueXDistanceRoundingPoint = Math.floor((valueX - prevValueX) / 2);
+                        valueXDistanceRoundingPoint = Math.floor((valueX - prevValueX) / 2);
                         if (draggedSliderHandle.prevPageX < (prevValueX + valueXDistanceRoundingPoint)) {
                             swipeMove(draggedSliderHandle, prevValueX);
                         } else {
@@ -237,7 +239,7 @@ angular.module('angular-custom-range-slider', [])
                     } else {
                         var nextValue = Math.min(draggedHandleValue.value + draggedHandleValue.step, scope.max);
                         var nextValueX = calculateXForValue(nextValue);
-                        var valueXDistanceRoundingPoint = Math.floor((nextValueX - valueX) / 2);
+                        valueXDistanceRoundingPoint = Math.floor((nextValueX - valueX) / 2);
                         if (draggedSliderHandle.prevPageX > (nextValueX - valueXDistanceRoundingPoint)) {
                             swipeMove(draggedSliderHandle, nextValueX);
                         } else {
@@ -343,6 +345,7 @@ angular.module('angular-custom-range-slider', [])
                     if (scope.isValid(handleValue)) {
                         handleValue.value = scope.formattedToTick({value: handleValue.displayValue});
                         updateSliderHandleElement(handleValue.sliderHandle, handleValue.value);
+                        scope.$emit('dragEnd', {valueIndex: handleValue.sliderHandle.handleIndex});
                     }
                 };
 
