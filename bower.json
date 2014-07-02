@@ -1,6 +1,9 @@
 {
     "name": "angular-custom-range-slider",
     "version": "1.0.12",
+    "authors": [
+        "peteclodi <pete.clodi@gmail.com>"
+    ],
     "homepage": "https://github.com/peteclodi/angular-custom-range-slider",
     "description": "A range slider directive using only Angular.js with no jQuery dependencies",
     "main": "src/angular-custom-range-slider.js",
