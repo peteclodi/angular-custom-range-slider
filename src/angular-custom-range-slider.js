@@ -100,7 +100,6 @@ angular.module('angular-custom-range-slider', [])
                     sliderHandle.getHandleOffset = function () {
                         return this.prop('clientWidth') / 2;
                     };
-                    handleValue.sliderHandle = sliderHandle;
 
                     if (index < (scope.handleValues.length - 1)) {
                         var sliderInnerRangeClass = "angular-custom-range-slider-inner-range";
@@ -160,7 +159,6 @@ angular.module('angular-custom-range-slider', [])
                 sliderHandles.forEach(function (sliderHandle) {
                     sliderRangeElement.append(sliderHandle);
                 });
-
 
                 function swipeMove(draggedHandle, pageX) {
                     if (pageX === draggedHandle.prevPageX) {
@@ -246,8 +244,6 @@ angular.module('angular-custom-range-slider', [])
                             swipeMove(draggedSliderHandle, valueX);
                         }
                     }
-
-
                 }
 
                 function validateHandleSteppingValue(handleValue) {
@@ -343,9 +339,10 @@ angular.module('angular-custom-range-slider', [])
                 scope.handleValueChanged = function (handleValue) {
                     // pass the value in as an object so that it will be properly marshaled to the parent controller
                     if (scope.isValid(handleValue)) {
+                        var index = scope.handleValues.indexOf(handleValue);
                         handleValue.value = scope.formattedToTick({value: handleValue.displayValue});
-                        updateSliderHandleElement(handleValue.sliderHandle, handleValue.value);
-                        scope.$emit('dragEnd', {valueIndex: handleValue.sliderHandle.handleIndex});
+                        updateSliderHandleElement(sliderHandles[index], handleValue.value);
+                        scope.$emit('dragEnd', {valueIndex: index});
                     }
                 };
 
@@ -359,13 +356,9 @@ angular.module('angular-custom-range-slider', [])
                         return;
                     }
 
-                    for (var index = 0; index < newHandleValues.length; ++index) {
-                        angular.extend(newHandleValues[index], { sliderHandle: oldHandleValues[index].sliderHandle });
-                    }
-
                     angular.forEach(newHandleValues, function (handleValue) {
                         handleValue.displayValue = formatTickValue(handleValue.value);
-                        updateSliderHandleElement(handleValue.sliderHandle, handleValue.value);
+                        updateSliderHandleElement(sliderHandles[scope.handleValues.indexOf(handleValue)], handleValue.value);
                     });
                 });
 
@@ -374,7 +367,7 @@ angular.module('angular-custom-range-slider', [])
                         var value = scope.formattedToTick({value: handleValue.displayValue});
 
                         if (valueOnStep(value, handleValue.step)) {
-                            var currentHandleElement = handleValue.sliderHandle;
+                            var currentHandleElement = sliderHandles[scope.handleValues.indexOf(handleValue)];
                             var newValuesX = calculateXForValue(value);
                             var handlesLeadingEdge = newValuesX - currentHandleElement.getHandleOffset();
                             var handlesTrailingEdge = newValuesX + currentHandleElement.getHandleOffset();
@@ -410,8 +403,9 @@ angular.module('angular-custom-range-slider', [])
                                     currentValue += handleValue.step - (currentValue % handleValue.step);
                                 }
                                 newValuesX = calculateXForValue(currentValue);
-                                var handlesTrailingEdge = newValuesX + handleValue.sliderHandle.getHandleOffset();
-                                var nextSlider = handleValue.sliderHandle.handleIndex < (sliderHandles.length - 1) ? sliderHandles[handleValue.sliderHandle.handleIndex + 1] : undefined;
+                                var handleIndex = scope.handleValues.indexOf(handleValue);
+                                var handlesTrailingEdge = newValuesX + sliderHandles[handleIndex].getHandleOffset();
+                                var nextSlider = handleIndex < (sliderHandles.length - 1) ? sliderHandles[handleIndex + 1] : undefined;
                                 if (angular.isUndefined(nextSlider) || (nextSlider.prevPageX - nextSlider.getHandleOffset()) > handlesTrailingEdge) {
                                     handleValue.displayValue = scope.tickToFormatted({value: currentValue});
                                     scope.handleValueChanged(handleValue);
@@ -427,8 +421,9 @@ angular.module('angular-custom-range-slider', [])
                                     currentValue -= currentValue % handleValue.step;
                                 }
                                 newValuesX = calculateXForValue(currentValue);
-                                var handlesLeadingEdge = newValuesX - handleValue.sliderHandle.getHandleOffset();
-                                var prevSlider = handleValue.sliderHandle.handleIndex > 0 ? sliderHandles[handleValue.sliderHandle.handleIndex - 1] : undefined;
+                                var handleIndex = scope.handleValues.indexOf(handleValue);
+                                var handlesLeadingEdge = newValuesX - sliderHandles[handleIndex].getHandleOffset();
+                                var prevSlider = handleIndex > 0 ? sliderHandles[handleIndex - 1] : undefined;
                                 if (angular.isUndefined(prevSlider) || (prevSlider.prevPageX + prevSlider.getHandleOffset()) < handlesLeadingEdge) {
                                     handleValue.displayValue = scope.tickToFormatted({value: currentValue});
                                     scope.handleValueChanged(handleValue);
