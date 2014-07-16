@@ -1,26 +1,26 @@
 'use strict';
 
 angular
-  .module('angularSliderApp', [
-    'ngRoute',
-    'ngTouch',
-    'angular-custom-range-slider'
-  ])
-  .config(function ($routeProvider) {
-    $routeProvider
-      .when('/', {
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl'
-      })
-      .otherwise({
-        redirectTo: '/'
-      });
-  });
+    .module('angularSliderApp', [
+        'ngRoute',
+        'ngTouch',
+        'angular-custom-range-slider'
+    ])
+    .config(function ($routeProvider) {
+        $routeProvider
+            .when('/', {
+                templateUrl: 'views/main.html',
+                controller: 'MainCtrl'
+            })
+            .otherwise({
+                redirectTo: '/'
+            });
+    });
 
 // Extend the default Number object with a formatMoney() method:
 // usage: someVar.formatMoney(decimalPlaces, symbol, thousandsSeparator, decimalSeparator)
 // defaults: (2, "$", ",", ".")
-Number.prototype.formatMoney = function(places, symbol, thousand, decimal) {
+Number.prototype.formatMoney = function (places, symbol, thousand, decimal) {
     places = !isNaN(places = Math.abs(places)) ? places : 2;
     symbol = symbol !== undefined ? symbol : "$";
     thousand = thousand || ",";

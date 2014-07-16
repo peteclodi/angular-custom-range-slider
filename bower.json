@@ -10,10 +10,10 @@
         "src/angular-custom-range-slider.js",
         "styles/angular-custom-range-slider.css"
     ],
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/peteclodi/angular-custom-range-slider.git"
-	},
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/peteclodi/angular-custom-range-slider.git"
+    },
     "keywords": [
         "angular",
         "slider",
