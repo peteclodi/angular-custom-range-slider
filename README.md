@@ -24,7 +24,7 @@ This control provides the basic functionality that is expected of a slider contr
 ## Using angular-custom-range-slider in your project
 
 ### Installing from Bower
-    **add Bower install instructions once Bower support is added**
+    bower install angular-custom-range-slider
 
 ### Using with your code
     <angular-custom-range-slider min="20" max="80" handle-values="sliderValues" show-values show-ticks
