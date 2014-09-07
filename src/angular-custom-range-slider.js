@@ -120,9 +120,6 @@ angular.module('angular-custom-range-slider', [])
                     handleValue.displayValue = formatTickValue(handleValue.value);
 
                     sliderHandle.prevPageX = NaN;
-                    sliderHandle.ready(function () {
-                        updateSliderHandleElement(sliderHandle, handleValue.value);
-                    });
 
                     $swipe.bind(sliderHandle, {
                         start: function (coords) {
@@ -158,6 +155,9 @@ angular.module('angular-custom-range-slider', [])
                 // This will create them at the top of the Z-Order and the drawing will be as expected
                 sliderHandles.forEach(function (sliderHandle) {
                     sliderRangeElement.append(sliderHandle);
+                    sliderHandle.ready(function () {
+                        updateSliderHandleElement(sliderHandle, scope.handleValues[sliderHandle.handleIndex].value);
+                    });
                 });
 
                 function swipeMove(draggedHandle, pageX) {
